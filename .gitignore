@@ -1,0 +1,165 @@
+# Environment Variables
+.env
+.env.local
+.env.*.local
+.env.example.local
+
+# Backend - Python
+backend/venv/
+backend/env/
+backend/.venv/
+backend/.env
+backend/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
+backend/*.so
+backend/.Python
+backend/build/
+backend/develop-eggs/
+backend/dist/
+backend/downloads/
+backend/eggs/
+backend/.eggs/
+backend/lib/
+backend/lib64/
+backend/parts/
+backend/sdist/
+backend/var/
+backend/wheels/
+backend/pip-wheel-metadata/
+backend/share/python-wheels/
+backend/*.egg-info/
+backend/.installed.cfg
+backend/*.egg
+backend/MANIFEST
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+backend/.tox/
+backend/.hypothesis/
+backend/.mypy_cache/
+backend/.dmypy.json
+backend/dmypy.json
+backend/.pyre/
+backend/*.log
+
+# Backend - Chroma Database
+backend/data/chroma_db/
+backend/data/*.db
+backend/*.db
+
+# Frontend - Node
+frontend/node_modules/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.pnpm-debug.log*
+
+# Frontend - React/Build
+frontend/build/
+frontend/dist/
+frontend/.dist/
+frontend/out/
+
+# Frontend - Environment
+frontend/.env.local
+frontend/.env.*.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# IDE - VS Code
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# IDE - PyCharm/WebStorm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# IDE - Sublime
+*.sublime-project
+*.sublime-workspace
+
+# IDE - Vim, Nano
+.swp
+.swo
+*~
+.vim/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Certificates & Keys
+*.pem
+*.key
+*.crt
+*.cert
+
+# Platform-specific
+.vscode-server/
+.vscode-server-insiders/
+
+# Temp files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+
+# Lock files (optional - uncomment if you prefer to track these)
+# frontend/package-lock.json
+# frontend/yarn.lock
+
+# MacOS
+.AppleDouble
+.LSOverride
+
+# Generated documentation
+docs/_build/
+site/
+
+# Cache
+__pycache__/
+.cache/
+*.cache
+
+# Test coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Jupyter
+.jupyter/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre
+.pyre/
+
+# Other
+*.swp
+*.swo
+dist/
+build/
