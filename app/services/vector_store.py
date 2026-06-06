@@ -19,7 +19,7 @@ class VectorStoreServices:
         self.persist_dir.mkdir(parents=True, exist_ok = True)
 
         self.vector_store = self._initialize_or_load_store()
-
+        
     def _initialize_or_load_store(self) -> Chroma:
         """Initialize Chroma, creating or loading existing collection"""
         try:
