@@ -11,7 +11,7 @@ from pathlib import Path
 logger = get_logger(__name__)
 settings = get_settings()
 
-class VectorStoreServices:
+class VectorStoreService:
     """Manage ChromaDB for a single, pre-loaded document"""
     def __init__(self,embedding_service: EmbeddingService):
         self.embedding_service = embedding_service
