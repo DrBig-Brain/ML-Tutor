@@ -16,9 +16,17 @@ class SourceChunk(BaseModel):
 
 class QueryResponse(BaseModel):
     query:str
+    answer:str
+    source:Optional[List[SourceChunk]]= None
+    processing_time_ms:float
+    model_use:str
+    timestamp:datetime = Field(default_factory=datetime.now)
+class HealthResponse(BaseModel):
+    query:str
     version:str
     document_loaded:bool
     vector_store_ready:bool
+    llm_api_ready:bool
     total_chunks: int
 
 class DocumentInfoResponse(BaseModel):
