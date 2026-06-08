@@ -5,12 +5,12 @@ from typing import List,Dict,Any,Tuple
 from langchain_core.documents import Document
 from app.core.config import get_settings
 from app.services.vector_store import VectorStoreService
-from app.core.expections import LLMServiceExcepiton
+from app.core.exceptions import LLMServiceError
 from app.core.logging_config import get_logger
 import time
 import asyncio
 
-logger = get_logger(__name___)
+logger = get_logger(__name__)
 settings = get_settings()
 
 class RAGChainService:
@@ -25,15 +25,14 @@ class RAGChainService:
         try:
             return ChatOpenAI(
                 model = settings.LLM_MODEL_NAME,
-                openai_api_base = settings.LLM_API_BASE_URL,
-                openai_api_key = settings.LLM_API_KEY,
+                api_key = settings.LLM_API_KEY,
                 temperature = settings.LLM_TEMPERATURE,
                 max_token = 500,
                 timeout = 60
             )
         except Exception as e:
             logger.error(f"LLM Initialization failed: {str(e)}")
-            return LLMServiceExcepiton(f"Failed to initialize LLM: {str(e)}")
+            return LLMServiceError(f"Failed to initialize LLM: {str(e)}")
         
     def _create_prompt_template(self) -> ChatPromptTemplate:
         """Create the prompt template for QA"""
@@ -114,7 +113,7 @@ class RAGChainService:
         
         except Exception as e:
             logger.error(f"Question answering failed: {str(e)}")
-            return LLMServiceExcepiton(f"Failed to answer question: {str(e)}")
+            return LLMServiceError(f"Failed to answer question: {str(e)}")
         
     async def check_llm_health(self)-> bool:
         """Check if LLM API is accessible"""

@@ -15,8 +15,7 @@ class EmbeddingService:
     def __init__(self):
         self.embeddings = OpenAIEmbeddings(
             model =settings.EMBEDDING_MODEL,
-            open_ai_base = settings.LLM_API_BASE_URL,
-            open_api_key = settings.LLM_API_KEY,
+            api_key = settings.LLM_API_KEY,
             chunk_size = 100
         )
         self._executor = ThreadPoolExecutor(max_workers = 2)

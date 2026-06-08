@@ -12,7 +12,7 @@ def get_embedding_service() -> EmbeddingService:
 @lru_cache()
 def get_vector_store() -> VectorStoreService:
     """Singleton vector store service"""
-    return VectorStoreService()
+    return VectorStoreService(embedding_service=EmbeddingService())
 
 @lru_cache()
 def get_rag_chain() -> RAGChainService:

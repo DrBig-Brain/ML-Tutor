@@ -15,7 +15,7 @@ class VectorStoreService:
     """Manage ChromaDB for a single, pre-loaded document"""
     def __init__(self,embedding_service: EmbeddingService):
         self.embedding_service = embedding_service
-        self.persist_dir = Path(settings.CHROMA_PERSISTENT_DIR)
+        self.persist_dir = Path(settings.CHROMA_PERSIST_DIR)
         self.persist_dir.mkdir(parents=True, exist_ok = True)
 
         self.vector_store = self._initialize_or_load_store()

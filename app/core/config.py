@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     PDF_PATH:str = "./dataset/dataset.pdf"
 
-    CHROMA_PERSISTENT_DIR:str = "./chroma_db"
+    CHROMA_PERSIST_DIR:str = "./chroma_db"
     CHROMA_COLLECTION_NAME:str = "Hands on Machine Learning"
 
     CHUNK_SIZE:int = 1000
@@ -26,8 +26,8 @@ class Settings(BaseSettings):
     DEFAULT_TOP_K:int = 4
     MAX_TOP_K:int = 10
 
-    class config:
-        env_file = ".evn"
+    class Config:
+        env_file = ".env"
         case_sensitive = True
 
 @lru_cache

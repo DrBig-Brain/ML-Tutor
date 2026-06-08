@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
-from app.models.schemes import QueryRequest, QueryResponse, DocumentInfoResponse
+from app.models.schemas import QueryRequest, QueryResponse, DocumentInfoResponse
 from app.services.rag_chain import RAGChainService
 from app.api.dependencies import get_rag_chain
 from app.core.exceptions import LLMServiceError, VectorStoreError
