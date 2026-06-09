@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     LLM_MODEL_NAME:str = "gpt-3.5-turbo"
     LLM_TEMPERATURE:float = 0.1
 
-    EMBEDDING_MODEL:str = "text-embedding-3-small"
+    EMBEDDING_MODEL:str = "sentence-transformers/all-MiniLM-L6-v2"
 
     PDF_PATH:str = "./dataset/dataset.pdf"
 

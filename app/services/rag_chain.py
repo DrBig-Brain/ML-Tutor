@@ -17,7 +17,7 @@ settings = get_settings()
 class RAGChainService:
     """RAG pipeline for answer question from a single pdf"""
     def __init__(self,vector_store_service: VectorStoreService):
-        self.vector_store_service = vector_store_service(EmbeddingService)
+        self.vector_store_service = vector_store_service(EmbeddingService())
         self.llm = self._initialize_llm()
         self.prompt_template = self._create_prompt_template()
 
