@@ -25,7 +25,7 @@ class VectorStoreService:
         try:
             return Chroma(
                 collection_name = settings.CHROMA_COLLECTION_NAME,
-                embedding_function = self.embedding_service.embeddings,
+                embedding_function = self.embedding_service.embed_document,
                 persist_directory = str(self.persist_dir)
             )
         except Exception as e:

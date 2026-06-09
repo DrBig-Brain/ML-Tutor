@@ -22,7 +22,7 @@ class QueryResponse(BaseModel):
     model_use:str
     timestamp:datetime = Field(default_factory=datetime.now)
 class HealthResponse(BaseModel):
-    query:str
+    status:str
     version:str
     document_loaded:bool
     vector_store_ready:bool

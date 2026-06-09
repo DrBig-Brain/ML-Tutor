@@ -17,7 +17,7 @@ def get_vector_store() -> VectorStoreService:
 @lru_cache()
 def get_rag_chain() -> RAGChainService:
     """Sinlgeton Rag chain service"""
-    return RAGChainService()
+    return RAGChainService(vector_store_service=VectorStoreService)
 
 @lru_cache()
 def get_document_loader() -> DocumentLoader:

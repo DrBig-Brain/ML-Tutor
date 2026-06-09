@@ -9,6 +9,7 @@ from app.core.exceptions import LLMServiceError
 from app.core.logging_config import get_logger
 import time
 import asyncio
+from app.services.embedding_service import EmbeddingService
 
 logger = get_logger(__name__)
 settings = get_settings()
@@ -16,7 +17,7 @@ settings = get_settings()
 class RAGChainService:
     """RAG pipeline for answer question from a single pdf"""
     def __init__(self,vector_store_service: VectorStoreService):
-        self.vector_store_service = vector_store_service
+        self.vector_store_service = vector_store_service(EmbeddingService)
         self.llm = self._initialize_llm()
         self.prompt_template = self._create_prompt_template()
 
@@ -27,7 +28,7 @@ class RAGChainService:
                 model = settings.LLM_MODEL_NAME,
                 api_key = settings.LLM_API_KEY,
                 temperature = settings.LLM_TEMPERATURE,
-                max_token = 500,
+                max_tokens = 500,
                 timeout = 60
             )
         except Exception as e:

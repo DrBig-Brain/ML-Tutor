@@ -46,6 +46,13 @@ class DocumentLoader:
                 raise DocumentProcessingError("No extraction from pdff")
             logger.info(f"Loaded PDF: {pdf_path.name} ({len(documents)}pages)")
 
+            for doc in documents:
+                doc.page_content = (
+                    doc.page_content
+                    .encode("utf-8",errors="ignore")
+                    .decode("utf-8")
+                )
+
             for i,doc in enumerate(documents):
                 doc.metadata["chunk_type"] = "origial_page"
                 doc.metadata["source_file"] = pdf_path.name

@@ -47,7 +47,7 @@ async def get_document_info(
 ):
     """Get information about the loaded document"""
     try:
-        chunk_count = await rag_chain.vector_store.get_chunk_count()
+        chunk_count = await rag_chain.vector_store_service.get_chunk_count()
 
         return DocumentInfoResponse(
             filename=settings.PDF_PATH.split("/")[-1],
@@ -59,4 +59,4 @@ async def get_document_info(
         )
     except Exception as e:
         logger.error(f"Failed to get document info: {str(e)}")
-        raise HTTPException(status_code = 500, detait = "Failed to retrieve document information")
+        raise HTTPException(status_code = 500, detail = "Failed to retrieve document information")

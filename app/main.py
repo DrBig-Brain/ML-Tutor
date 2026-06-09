@@ -46,7 +46,7 @@ async def lifespan(app: FastAPI):
             logger.info("loading and indexing pdf document")
 
             doc_hash, chunks = document_loader.load_and_chunk()
-            chunk_count = await vector_store.add_documnent(chunks)
+            chunk_count = await vector_store.add_document(chunks)
 
             logger.info(f"Successfully loaded PDF: {chunk_count} chunks indexed")
             logger.info(f"Document Hash: {doc_hash}")
@@ -143,18 +143,18 @@ def create_app() -> FastAPI:
                 version = settings.APP_VERSION,
                 document_loaded=document_loaded,
                 vector_store_ready=True,
-                llm_api = llm_ready,
+                llm_api_ready= llm_ready,
                 total_chunks = chunk_count
             )
         except Exception as e:
-            logger.error(f"Healthy Check Failed: {str(e)}")
+            logger.error(f"Health Check Failed: {str(e)}")
             return HealthResponse(
                 status = "unhealthy",
                 version = settings.APP_VERSION,
                 document_loaded = False,
                 vector_store_ready = False,
                 llm_api_ready = False,
-                total_chunk = 0
+                total_chunks = 0
             )
     return app
 
