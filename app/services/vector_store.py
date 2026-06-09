@@ -25,14 +25,14 @@ class VectorStoreService:
         try:
             return Chroma(
                 collection_name = settings.CHROMA_COLLECTION_NAME,
-                embedding_function = self.embedding_service.embed_document,
+                embedding_function = self.embedding_service.embeddings,
                 persist_directory = str(self.persist_dir)
             )
         except Exception as e:
             logger.error(f"Vector store initialization failed: {str(e)}")
             raise VectorStoreError(f"Failed to initialize vector store: {str(e)}")
-    
-    async def add_document(self, chunks: List[Document]) -> int:
+        
+    async def add_documents(self, chunks: List[Document]) -> int:
         """Add document chunk to vector store"""
         try:
             await asyncio.to_thread(

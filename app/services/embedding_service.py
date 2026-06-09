@@ -22,7 +22,7 @@ class EmbeddingService:
     async def embed_query(self, query:str) -> List[float]:
         """Generate embedding for a query string"""
         try:
-            loop = asyncio.get_envent_loop()
+            loop = asyncio.get_event_loop()
             embedding = await loop.run_in_executor(
                 self._executor,
                 self.embeddings.embed_query,
@@ -38,7 +38,8 @@ class EmbeddingService:
             loop = asyncio.get_event_loop()
             embeddings = await loop.run_in_executor(
                 self._executor,
-                self.embeddings.embed_documents
+                self.embeddings.embed_documents,
+                texts
             )
             return embeddings
         except Exception as e:

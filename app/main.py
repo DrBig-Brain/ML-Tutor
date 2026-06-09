@@ -46,7 +46,7 @@ async def lifespan(app: FastAPI):
             logger.info("loading and indexing pdf document")
 
             doc_hash, chunks = document_loader.load_and_chunk()
-            chunk_count = await vector_store.add_document(chunks)
+            chunk_count = await vector_store.add_documents(chunks)
 
             logger.info(f"Successfully loaded PDF: {chunk_count} chunks indexed")
             logger.info(f"Document Hash: {doc_hash}")
