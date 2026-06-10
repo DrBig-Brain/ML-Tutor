@@ -1,103 +1,279 @@
 # ML Tutor - RAG-Based Learning Assistant
 
-A Retrieval-Augmented Generation (RAG) powered learning assistant that answers questions about machine learning concepts from "Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow" using vector search and LLMs.
+A **Retrieval-Augmented Generation (RAG)** powered learning assistant that answers questions about machine learning concepts from "Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow". The system uses vector embeddings and local LLM inference to provide accurate, context-aware answers backed by source material.
 
 ## 🎯 Project Overview
 
-ML Tutor combines a **React frontend** with a **RAG backend** to create an intelligent Q&A system. The app indexes content from the ML textbook into a Chroma vector database, enabling semantic search and context-aware answers powered by large language models.
+ML Tutor is an intelligent Q&A system that processes an ML textbook PDF and enables semantic search combined with generative AI. When you ask a question, the system:
+
+1. **Retrieves** relevant content from the document using vector similarity search
+2. **Augments** the retrieved context with the original question
+3. **Generates** coherent, accurate answers using a local LLM (Ollama)
+
+This RAG approach ensures responses are grounded in the actual textbook content, reducing hallucinations and providing reliable learning assistance.
 
 ### Key Features
 
-- **📚 Smart Content Indexing**: Automatically processes and embeds ML textbook content into Chroma vector database
-- **🔍 Semantic Search**: Find relevant content using natural language queries
-- **🤖 RAG-Powered Responses**: Generate accurate, context-aware answers backed by source material
-- **⚡ Fast Retrieval**: Vector similarity search for instant contextual information
-- **💬 Interactive Chat UI**: Clean React interface for asking questions and exploring ML concepts
-- **📖 Source Attribution**: Responses include references to the source book sections
+- **📚 Automatic PDF Indexing**: Loads and chunks PDF documents into a vector database on startup
+- **🔍 Semantic Search**: Retrieves relevant sections using semantic similarity (no keyword matching)
+- **🤖 Local LLM Inference**: Uses Ollama with Llama 3.2 for private, on-device LLM inference
+- **⚡ Fast Retrieval**: Vector similarity search with configurable top-k results
+- **💬 RESTful API**: FastAPI backend for easy integration with any frontend
+- **📖 Source Attribution**: Optionally includes source document references in responses
+- **🔧 Persistent Vector Store**: ChromaDB for efficient storage and reuse of embeddings
 
 ## 🛠️ Technology Stack
 
 ### Backend
-- **Python 3.9+**
-- **ChromaDB**: Vector database for storing and retrieving embeddings
-- **LangChain**: Framework for building RAG pipelines
-- **FastAPI** or **Flask**: REST API server
-- **Scikit-learn & TensorFlow**: ML library references
-- **Sentence Transformers/OpenAI Embeddings**: For vectorizing text
-
-### Frontend
-- **React 18+**: UI framework
-- **TypeScript**: Type safety
-- **Axios/Fetch**: API communication
-- **Tailwind CSS** (optional): Styling
+- **Python 3.13+**: Core language
+- **FastAPI**: Modern web framework for API
+- **LangChain**: Framework for building RAG chains and LLM interactions
+- **ChromaDB**: Vector database for storing and searching embeddings
+- **Sentence Transformers** (`all-MiniLM-L6-v2`): Open-source embedding model
+- **PyPDF**: PDF document loading and parsing
+- **Ollama**: Local LLM runtime (Llama 3.2)
+- **Uvicorn**: ASGI server
 
 ## 📋 Prerequisites
 
-- Python 3.9 or higher
-- Node.js 16+ and npm/yarn
-- OpenAI API key or other LLM provider credentials (if using external LLM)
-- Git
+- **Python 3.13+**
+- **Ollama**: Download from [ollama.ai](https://ollama.ai) and run `ollama pull llama3.2`
+- **PDF Document**: Place your `dataset.pdf` in the `dataset/` directory
+- **Virtual Environment**: Recommended for dependency isolation
 
-## 🚀 Installation
+## 🚀 Quick Start
 
-### 1. Clone the Repository
+### 1. Clone and Setup
+
 ```bash
-git clone <repository-url>
-cd ML-tutor
+cd /home/abhinavmishra/Desktop/ML-Tutor
+source .venv/bin/activate  # Activate virtual environment
 ```
 
-### 2. Backend Setup
+### 2. Install Dependencies
 
 ```bash
-# Navigate to backend directory
-cd backend
+pip install -e .
+```
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+Or using the requirements file:
 
-# Install dependencies
+```bash
 pip install -r requirements.txt
-
-# Set environment variables
-cp .env.example .env
-# Edit .env with your API keys and configuration
 ```
 
-### 3. Frontend Setup
+### 3. Configure Environment
+
+Create a `.env` file in the root directory:
+
+```env
+# LLM Configuration
+LLM_API_BASE_URL=http://localhost:11434
+LLM_API_KEY=ollama
+LLM_MODEL_NAME=llama3.2
+LLM_TEMPERATURE=0.1
+
+# Embedding Model
+EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+
+# Document Configuration
+PDF_PATH=./dataset/dataset.pdf
+
+# Vector Store Configuration
+CHROMA_PERSIST_DIR=./chroma_db
+CHROMA_COLLECTION_NAME=Hands on Machine Learning
+CHUNK_SIZE=1000
+CHUNK_OVERLAP=200
+
+# Query Configuration
+DEFAULT_TOP_K=4
+MAX_TOP_K=10
+```
+
+### 4. Ensure Ollama is Running
 
 ```bash
-# Navigate to frontend directory
-cd ../frontend
+ollama serve
+# In another terminal, verify: ollama list
+```
 
-# Install dependencies
-npm install
+### 5. Start the FastAPI Server
 
-# Create environment file
-cp .env.example .env.local
-# Edit .env.local with API endpoint
+```bash
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+The API will be available at `http://localhost:8000`
+- **API Docs**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
+
+### 6. Query the API
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/query/" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "What is gradient descent?", "top_k": 4, "include_source": true}'
 ```
 
 ## 📁 Project Structure
 
 ```
-ML-tutor/
-├── backend/
-│   ├── app.py                 # Main FastAPI/Flask app
-│   ├── config.py              # Configuration settings
-│   ├── requirements.txt        # Python dependencies
-│   ├── .env.example           # Environment variables template
-│   ├── src/
-│   │   ├── ingestion/         # Data indexing pipeline
-│   │   │   └── book_loader.py # Load and process textbook
-│   │   ├── rag/               # RAG pipeline
-│   │   │   ├── retriever.py   # Vector search logic
-│   │   │   └── generator.py   # LLM response generation
-│   │   ├── api/               # API endpoints
-│   │   │   └── routes.py      # FastAPI routes
-│   │   └── utils/             # Utility functions
-│   └── data/
-│       └── chroma_db/         # Local Chroma database storage
+ML-Tutor/
+├── main.py                     # Entry point (minimal wrapper)
+├── pyproject.toml              # Project metadata and dependencies
+├── requirements.txt            # Pip requirements
+├── README.md                   # This file
+│
+├── app/                        # Main application package
+│   ├── main.py                # FastAPI application setup and lifespan
+│   │
+│   ├── api/                   # API layer
+│   │   ├── __init__.py
+│   │   ├── dependencies.py    # Dependency injection (FastAPI Depends)
+│   │   └── routes/
+│   │       ├── __init__.py
+│   │       └── query.py       # /api/v1/query endpoint
+│   │
+│   ├── core/                  # Core application configuration
+│   │   ├── __init__.py
+│   │   ├── config.py          # Settings via Pydantic (env variables)
+│   │   ├── exceptions.py      # Custom exception classes
+│   │   └── logging_config.py  # Logging setup
+│   │
+│   ├── models/                # Data models and schemas
+│   │   ├── __init__.py
+│   │   └── schemas.py         # Pydantic models for request/response
+│   │
+│   ├── services/              # Business logic layer
+│   │   ├── __init__.py
+│   │   ├── document_loader.py # PDF loading and chunking
+│   │   ├── embedding_service.py # Text embedding generation
+│   │   ├── vector_store.py    # ChromaDB interactions
+│   │   └── rag_chain.py       # RAG pipeline (retrieval + generation)
+│   │
+│   └── utils/                 # Utility functions
+│       └── __init__.py
+│
+├── dataset/                   # Document storage
+│   └── dataset.pdf           # Place your PDF here
+│
+└── chroma_db/                # Vector database (auto-created)
+    ├── chroma.sqlite3
+    └── [collection data]/
+```
+
+## 🔄 How It Works
+
+### 1. **Initialization (Startup)**
+- `app/main.py` defines FastAPI lifespan events
+- On startup, if ChromaDB doesn't have documents:
+  - `DocumentLoader` reads the PDF and chunks it (1000 tokens, 200 overlap)
+  - `EmbeddingService` generates embeddings using Sentence Transformers
+  - `VectorStoreService` stores chunks in ChromaDB
+
+### 2. **Query Processing (Runtime)**
+```
+User Query → FastAPI Endpoint → RAGChainService
+  ↓
+VectorStore.query() → Retrieve top-k similar chunks
+  ↓
+ChatOllama (Llama 3.2) → Generate answer from context
+  ↓
+QueryResponse → Return to client
+```
+
+## 📝 API Reference
+
+### Query Endpoint
+
+**POST** `/api/v1/query/`
+
+**Request:**
+```json
+{
+  "query": "What is overfitting?",
+  "top_k": 4,
+  "include_source": true
+}
+```
+
+**Response:**
+```json
+{
+  "query": "What is overfitting?",
+  "answer": "Overfitting occurs when a model learns the training data too well...",
+  "sources": [
+    {
+      "content": "A model that overfits the training data...",
+      "metadata": {"page": 5}
+    }
+  ],
+  "retrieval_time_ms": 45,
+  "generation_time_ms": 320
+}
+```
+
+## 🔧 Configuration Details
+
+All settings are loaded from `.env` file via `app/core/config.py`:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LLM_API_BASE_URL` | http://localhost:11434 | Ollama API endpoint |
+| `LLM_MODEL_NAME` | llama3.2 | Model to use |
+| `LLM_TEMPERATURE` | 0.1 | Generation temperature (lower = more deterministic) |
+| `EMBEDDING_MODEL` | sentence-transformers/all-MiniLM-L6-v2 | Embedding model |
+| `PDF_PATH` | ./dataset/dataset.pdf | Path to input PDF |
+| `CHUNK_SIZE` | 1000 | Tokens per document chunk |
+| `CHUNK_OVERLAP` | 200 | Token overlap between chunks |
+| `DEFAULT_TOP_K` | 4 | Default number of retrieved chunks |
+| `MAX_TOP_K` | 10 | Maximum retrievable chunks |
+
+## 🧪 Testing
+
+### Test with Python
+
+```python
+import requests
+
+response = requests.post(
+    "http://localhost:8000/api/v1/query/",
+    json={"query": "Explain linear regression", "top_k": 4}
+)
+print(response.json())
+```
+
+### Interactive API Explorer
+
+Open `http://localhost:8000/docs` in your browser for an interactive Swagger UI.
+
+## 🚨 Troubleshooting
+
+**Problem: "PDF file not found at ./dataset/dataset.pdf"**
+- Solution: Ensure your PDF is placed at `dataset/dataset.pdf`
+
+**Problem: Ollama connection refused**
+- Solution: Start Ollama with `ollama serve` in another terminal
+
+**Problem: Embeddings are slow on first startup**
+- Solution: Normal on first run. Embeddings are cached in ChromaDB after initial indexing
+
+**Problem: "Model llama3.2 not found"**
+- Solution: Run `ollama pull llama3.2` to download the model
+
+## 📚 Key Files and Responsibilities
+
+| File | Purpose |
+|------|---------|
+| [app/main.py](app/main.py) | FastAPI app setup, lifespan hooks |
+| [app/api/routes/query.py](app/api/routes/query.py) | Query endpoint handler |
+| [app/services/document_loader.py](app/services/document_loader.py) | PDF parsing and chunking |
+| [app/services/embedding_service.py](app/services/embedding_service.py) | Text embedding generation |
+| [app/services/vector_store.py](app/services/vector_store.py) | ChromaDB operations |
+| [app/services/rag_chain.py](app/services/rag_chain.py) | RAG pipeline orchestration |
+| [app/core/config.py](app/core/config.py) | Configuration management |
+| [app/core/exceptions.py](app/core/exceptions.py) | Custom exceptions |
+| [app/models/schemas.py](app/models/schemas.py) | Pydantic request/response models |
 │
 ├── frontend/
 │   ├── public/

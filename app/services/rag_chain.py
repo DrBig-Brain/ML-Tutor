@@ -1,4 +1,5 @@
-from langchain_openai import ChatOpenAI
+# from langchain_openai import ChatOpenAI
+from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from typing import List,Dict,Any,Tuple
@@ -21,16 +22,20 @@ class RAGChainService:
         self.llm = self._initialize_llm()
         self.prompt_template = self._create_prompt_template()
 
-    def _initialize_llm(self) -> ChatOpenAI:
+    def _initialize_llm(self) -> ChatOllama:
         """Initialize the open ai llm"""
         try:
-            return ChatOpenAI(
+            '''return ChatOpenAI(
                 model = settings.LLM_MODEL_NAME,
                 api_key = settings.LLM_API_KEY,
                 temperature = settings.LLM_TEMPERATURE,
                 max_tokens = 500,
                 timeout = 60
-            )
+            )'''
+
+            return ChatOllama(
+                model = "llama3.2"
+            ) 
         except Exception as e:
             logger.error(f"LLM Initialization failed: {str(e)}")
             return LLMServiceError(f"Failed to initialize LLM: {str(e)}")
@@ -82,7 +87,7 @@ class RAGChainService:
 
         start_time = time.time()
         try:
-            retrieved = await self.vector_store.similarity_search(
+            retrieved = await self.vector_store_service.similarity_search(
                 query = question,
                 k = top_k
             )
@@ -93,7 +98,7 @@ class RAGChainService:
                 for doc, score in retrieved:
                     sources.append({
                         "text":doc.page_content[:800],
-                        "page_number":doc.metadat.get('page_number'),
+                        "page_number":doc.metadata.get('page_number'),
                         "relevance_score": round(score,3),
                         "chunk_index": doc.metadata.get('chunk_index',-1)
                     })
@@ -128,7 +133,7 @@ class RAGChainService:
 
     async def validate_retrieval(self,question:str, top_k:int = 2)-> Dict:
         """Debug method to test retrieval quality"""
-        retrieved = await self.vector_store.similarity_search(question, k=top_k)
+        retrieved = await self.vector_store_service.similarity_search(question, k=top_k)
         return {
             "question":question,
             "num_retrieved":len(retrieved),

@@ -19,7 +19,7 @@ class QueryResponse(BaseModel):
     answer:str
     source:Optional[List[SourceChunk]]= None
     processing_time_ms:float
-    model_use:str
+    model_used:str
     timestamp:datetime = Field(default_factory=datetime.now)
 class HealthResponse(BaseModel):
     status:str

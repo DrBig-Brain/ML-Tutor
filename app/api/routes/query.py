@@ -31,7 +31,7 @@ async def query_documents(
             answer = result["answer"],
             source=result.get("sources"),
             processing_time_ms=result["processing_time_ms"],
-            mode_used=result["model_used"]
+            model_used=result["model_used"]
         )
     except LLMServiceError as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
