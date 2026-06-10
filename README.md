@@ -18,7 +18,7 @@ This RAG approach ensures responses are grounded in the actual textbook content,
 - **🔍 Semantic Search**: Retrieves relevant sections using semantic similarity (no keyword matching)
 - **🤖 Local LLM Inference**: Uses Ollama with Llama 3.2 for private, on-device LLM inference
 - **⚡ Fast Retrieval**: Vector similarity search with configurable top-k results
-- **💬 RESTful API**: FastAPI backend for easy integration with any frontend
+- **💬 RESTful API**: FastAPI backend with interactive Swagger UI for easy querying
 - **📖 Source Attribution**: Optionally includes source document references in responses
 - **🔧 Persistent Vector Store**: ChromaDB for efficient storage and reuse of embeddings
 
@@ -162,6 +162,11 @@ ML-Tutor/
     └── [collection data]/
 ```
 
+**Note**: This is a backend-only project. The API can be accessed via:
+- Direct HTTP requests (curl, Python, etc.)
+- Interactive Swagger UI at `http://localhost:8000/docs`
+- ReDoc documentation at `http://localhost:8000/redoc`
+
 ## 🔄 How It Works
 
 ### 1. **Initialization (Startup)**
@@ -274,138 +279,73 @@ Open `http://localhost:8000/docs` in your browser for an interactive Swagger UI.
 | [app/core/config.py](app/core/config.py) | Configuration management |
 | [app/core/exceptions.py](app/core/exceptions.py) | Custom exceptions |
 | [app/models/schemas.py](app/models/schemas.py) | Pydantic request/response models |
-│
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/        # React components
-│   │   │   ├── ChatBox.tsx
-│   │   │   ├── Message.tsx
-│   │   │   └── SourceCitation.tsx
-│   │   ├── pages/
-│   │   │   └── Home.tsx
-│   │   ├── services/          # API service layer
-│   │   │   └── api.ts
-│   │   ├── App.tsx
-│   │   └── index.tsx
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── .env.example
-│
-├── docs/                      # Documentation
-│   ├── SETUP.md              # Detailed setup guide
-│   └── API.md                # API documentation
-│
-├── .gitignore
-└── README.md
+
+## � Usage
+
+### Access the API
+
+**Option 1: Interactive Swagger UI**
+```
+http://localhost:8000/docs
 ```
 
-## 🔧 Configuration
-
-### Backend (.env)
-```env
-# LLM Configuration
-LLM_PROVIDER=openai              # or: ollama, huggingface
-OPENAI_API_KEY=your_api_key
-LLM_MODEL=gpt-3.5-turbo
-
-# Embeddings Configuration
-EMBEDDING_MODEL=text-embedding-3-small
-EMBEDDING_PROVIDER=openai
-
-# Database Configuration
-CHROMA_DB_PATH=./data/chroma_db
-CHROMA_COLLECTION_NAME=ml_textbook
-
-# Server Configuration
-API_PORT=8000
-API_HOST=0.0.0.0
-
-# RAG Configuration
-RETRIEVAL_K=5                   # Number of documents to retrieve
-TEMPERATURE=0.7                 # LLM temperature
-```
-
-### Frontend (.env.local)
-```env
-REACT_APP_API_URL=http://localhost:8000
-REACT_APP_API_BASE=/api/v1
-```
-
-## 💻 Usage
-
-### Start the Backend
-
+**Option 2: cURL Request**
 ```bash
-cd backend
-source venv/bin/activate
-python app.py
+curl -X POST "http://localhost:8000/api/v1/query/" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "What is gradient descent?", "top_k": 4, "include_source": true}'
 ```
 
-The API will be available at `http://localhost:8000`
+**Option 3: Python Script**
+```python
+import requests
 
-### Start the Frontend
-
-```bash
-cd frontend
-npm start
+response = requests.post(
+    "http://localhost:8000/api/v1/query/",
+    json={"query": "Explain linear regression", "top_k": 4}
+)
+print(response.json())
 ```
-
-The app will open at `http://localhost:3000`
 
 ### API Endpoints
 
-#### Ask a Question
-```bash
-POST /api/v1/ask
-Content-Type: application/json
-
-{
-  "question": "What is gradient descent?"
-}
+#### Query the RAG System
+```
+POST /api/v1/query/
 ```
 
-Response:
+**Request Body:**
 ```json
 {
-  "answer": "Gradient descent is an optimization algorithm...",
-  "sources": [
-    {
-      "section": "Chapter 4: Gradient Descent",
-      "page": 125,
-      "excerpt": "..."
-    }
-  ]
+  "query": "What is overfitting?",
+  "top_k": 4,
+  "include_source": true
 }
 ```
 
-#### Index/Upload Content
-```bash
-POST /api/v1/index
-Content-Type: multipart/form-data
-
-file: <pdf_or_text_file>
+**Response:**
+```json
+{
+  "query": "What is overfitting?",
+  "answer": "Overfitting occurs when a model learns the training data too well...",
+  "sources": [
+    {
+      "content": "A model that overfits the training data...",
+      "metadata": {"page": 5}
+    }
+  ],
+  "retrieval_time_ms": 45,
+  "generation_time_ms": 320
+}
 ```
 
-## 🎓 Workflow
+## 🔄 How the RAG Pipeline Works
 
-1. **Ingestion Phase**
-   - Load textbook content (PDF/text)
-   - Split into chunks
-   - Generate embeddings using Sentence Transformers or OpenAI API
-   - Store in Chroma vector database
-
-2. **Query Phase**
-   - User asks a question in the React UI
-   - Backend receives the query
-   - Convert query to embeddings
-   - Retrieve similar documents from Chroma (top-k retrieval)
-   - Pass retrieved context + query to LLM
-   - LLM generates answer with citations
-
-3. **Response Phase**
-   - Return answer and sources to frontend
-   - Display with proper formatting and source links
+1. **Query Embedding**: Your question is converted to a vector embedding
+2. **Semantic Retrieval**: The system finds the most relevant sections from the PDF using vector similarity
+3. **Context Augmentation**: Retrieved chunks are combined with your original question
+4. **Answer Generation**: The LLM (Llama 3.2 via Ollama) generates an answer based on the context
+5. **Response**: The answer and source references are returned to you
 
 ## 📚 Sample Use Cases
 
@@ -418,22 +358,26 @@ file: <pdf_or_text_file>
 ## 🐛 Troubleshooting
 
 ### Chroma Database Issues
+If you want to reset and re-index from scratch:
 ```bash
-# Reset Chroma database
-rm -rf backend/data/chroma_db
-# Re-index the content
-python backend/src/ingestion/book_loader.py
+rm -rf ./chroma_db
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### API Connection Issues
-- Verify backend is running: `curl http://localhost:8000/health`
-- Check frontend `.env.local` has correct API URL
-- Look for CORS configuration in backend
+- Verify backend is running: `curl http://localhost:8000/docs`
+- Check that Ollama is running: `ollama serve`
+- Ensure the PDF is placed at `dataset/dataset.pdf`
 
 ### Embedding Generation Issues
-- Verify API keys in `.env`
-- Check internet connection for external LLM providers
-- For local models, ensure sufficient memory
+- First startup takes longer due to embedding generation (cached after initial run)
+- Ensure you have the Sentence Transformers model downloaded (auto-downloads on first use)
+- Check that you have sufficient disk space for ChromaDB
+
+### Common Errors
+- **"PDF file not found"**: Place your PDF at `dataset/dataset.pdf`
+- **"Ollama connection refused"**: Run `ollama serve` in another terminal
+- **"Model llama3.2 not found"**: Run `ollama pull llama3.2`
 
 ## 🤝 Contributing
 
@@ -452,15 +396,16 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [ChromaDB Documentation](https://docs.trychroma.com/)
 - [LangChain Documentation](https://python.langchain.com/)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [React Documentation](https://react.dev/)
+- [Ollama Documentation](https://ollama.ai/)
+- [Sentence Transformers](https://www.sbert.net/)
 - [Hands-On Machine Learning Book](https://www.oreilly.com/library/view/hands-on-machine-learning/9781098125967/)
 
 ## 📞 Support
 
 For questions or issues:
-- Open an GitHub issue
-- Check existing documentation in `/docs`
-- Review API documentation in `/docs/API.md`
+- Open a GitHub issue
+- Review this README for setup and configuration help
+- Check the FastAPI interactive docs at `/docs` for endpoint details
 
 ---
 
